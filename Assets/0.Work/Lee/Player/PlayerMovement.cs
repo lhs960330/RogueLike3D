@@ -10,6 +10,15 @@ public class PlayerMovement : MonoBehaviour
     {
         isDashing = false;
     }
+    public void Rotate( Vector3 direction )
+    {
+        if ( direction.sqrMagnitude > 0.01f )
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 0.2f); // 부드럽게 회전
+        }
+    }
+
     public void Move( Vector3 direction, float speed )
     {
         if ( direction.sqrMagnitude > 0.01f )
@@ -20,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     public void Dash( Vector3 direction, float speed )
     {
         StartCoroutine(DashCoroutine(direction, speed));
+        Rotate(direction);
     }
     private IEnumerator DashCoroutine( Vector3 moveInput, float dashSpeed )
     {
