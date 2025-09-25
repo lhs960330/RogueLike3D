@@ -1,14 +1,18 @@
+ï»¿using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerTest : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] Animator animator;
+
     private Vector2 moveInput;
     private void Start()
     {
-        // ÃÊ±â È°¼ºÈ­
+        // ì´ˆê¸° í™œì„±í™”
         Manager.EXInput.ChangeInput(Define.ActionMap.Player);
+        animator = GetComponent<Animator>();
     }
     private void Update()
     {
@@ -16,22 +20,36 @@ public class PlayerTest : MonoBehaviour
     }
     private void OnMove( InputValue value )
     {
-        // Player MapÀÌ È°¼ºÈ­µÈ »óÅÂ¿¡¼­¸¸ Ã³¸®
+        // Player Mapì´ í™œì„±í™”ëœ ìƒíƒœì—ì„œë§Œ ì²˜ë¦¬
         if ( Manager.EXInput.CurrentMap != Define.ActionMap.Player ) return;
 
         moveInput = value.Get<Vector2>();
-        Debug.Log("ÀÌµ¿");
-        // Ä³¸¯ÅÍ ÀÌµ¿ Ã³¸®
+        Debug.Log(moveInput);
+        // ìºë¦­í„° ì´ë™ ì²˜ë¦¬
+
     }
     private void Move()
     {
+        AniMove();
         if ( moveInput != Vector2.zero )
         {
+          
             Vector3 moveDir = new Vector3(moveInput.x, 0, moveInput.y);
             transform.Translate(moveDir * moveSpeed * Time.deltaTime, Space.World);
         }
+        else
+        {
+            animator.SetFloat("MoveX", moveInput.x);
+            animator.SetFloat("MoveY", moveInput.y);
+        }
     }
+    private void AniMove()
+    {
+        // Animator íŒŒë¼ë¯¸í„° ì „ë‹¬
+        animator.SetFloat("MoveX", moveInput.x);
+        animator.SetFloat("MoveY", moveInput.y);
 
+    }
     private void OnCancel()
     {
         if ( Manager.EXInput.CurrentMap == Define.ActionMap.Player )
