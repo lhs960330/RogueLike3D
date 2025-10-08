@@ -7,9 +7,10 @@ public class PlayerController : MonoBehaviour
     private PlayerMovement movement;
     private PlayerAnimator animator;
 
-    [SerializeField] private float moveSpeed;
+    [Header("플레이어 속도")]
+    [SerializeField] private float moveSpeed = 10;
     [SerializeField] private float dashSpeed = 10f;
-
+   
     private Vector2 moveInput;
     private Camera mainCamera;
     private Vector3 worldMoveDir;
@@ -29,7 +30,7 @@ public class PlayerController : MonoBehaviour
     private void OnDash( InputValue value )
     {
         if (worldMoveDir.sqrMagnitude < 0.01f) return;
-        
+
         if (!movement.isDashing)
         {
             animator.DashAnimation();
@@ -41,7 +42,7 @@ public class PlayerController : MonoBehaviour
     {
         LookAtMouse();
 
-        // [수정] 대시 중일 때와 아닐 때의 로직을 분리합니다.
+        
         if (movement.isDashing)
         {
             // 대시 중일 때는 PlayerMovement에 저장된 대시 방향과 대시 속도를 애니메이션에 전달합니다.
@@ -71,6 +72,7 @@ public class PlayerController : MonoBehaviour
         movement.Move(moveSpeed);
     }
 
+    // 마우스 방향으로 캐릭이 바라보기
     private void LookAtMouse()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);

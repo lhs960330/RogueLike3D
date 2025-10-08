@@ -35,9 +35,7 @@ public class PlayerAnimator : MonoBehaviour
             float animDistancePerSecond = GetAnimDistancePerSecond(moveInput);
             if ( animDistancePerSecond > 0.0001f )
             {
-                // [수정] 하드코딩된 0.1f 대신 animationSpeedMultiplier 변수를 사용합니다.
                 animator.speed = (moveSpeed / animDistancePerSecond) * animationSpeedMultiplier;
-                // [제거] 성능에 영향을 줄 수 있는 Debug.Log를 제거했습니다.
             }
             else
             {
