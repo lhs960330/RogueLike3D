@@ -1,28 +1,24 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// [수정] 이 스크립트에 필요한 컴포넌트가 없으면 자동으로 추가해주는 어트리뷰트입니다.
-// PlayerMovement나 PlayerAnimator가 실수로 삭제되어도 null 예외가 발생하는 것을 방지합니다.
 [RequireComponent(typeof(PlayerMovement), typeof(PlayerAnimator))]
 public class PlayerController : MonoBehaviour
 {
-    // [수정] Inspector에서 할당하는 [SerializeField]를 제거하고 private으로 변경했습니다.
-    // 컴포넌트 참조는 Awake에서 GetComponent로 통일하여 코드의 일관성을 높입니다.
     private PlayerMovement movement;
     private PlayerAnimator animator;
 
     [SerializeField] private float moveSpeed;
     [SerializeField] private float dashSpeed = 10f;
-    // [제거] dashDuration 변수는 PlayerMovement 스크립트로 이동하여 역할을 중앙에서 관리하도록 했습니다.
 
     private Vector2 moveInput;
+    private Camera mainCamera;
+    private Vector3 worldMoveDir;
 
-    // [수정] Start 대신 Awake에서 컴포넌트를 찾는 것이 더 안전합니다.
-    // 다른 스크립트의 Awake에서 이 컴포넌트를 참조할 때 null이 되는 것을 방지합니다.
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
         animator = GetComponent<PlayerAnimator>();
+        mainCamera = Camera.main;
     }
 
     private void OnMove( InputValue value )
@@ -32,29 +28,64 @@ public class PlayerController : MonoBehaviour
 
     private void OnDash( InputValue value )
     {
-        if ( moveInput == Vector2.zero ) return;
-        if ( !movement.isDashing )
+        if (worldMoveDir.sqrMagnitude < 0.01f) return;
+        
+        if (!movement.isDashing)
         {
-            // [수정] InputSystem의 Vector2 값을 올바른 3D 월드 방향(x, 0, z)으로 변환합니다.
-            // 이전 코드에서는 Vector2(x, y)가 Vector3(x, y, 0)으로 잘못 변환되는 버그가 있었습니다.
-            Vector3 dashDirection = new Vector3(moveInput.x, 0, moveInput.y);
             animator.DashAnimation();
-            movement.Dash(dashDirection, dashSpeed); // 수정된 3D 방향 벡터를 전달합니다.
+            movement.Dash(worldMoveDir, dashSpeed);
         }
     }
 
     private void Update()
     {
-        Vector3 moveDir = new Vector3(moveInput.x, 0, moveInput.y);
-        movement.SetMoveDirection(moveDir);
+        LookAtMouse();
 
-        // [수정] 애니메이션 속도 계산을 위해 PlayerMovement에서 실제 이동 속도(CurrentSpeed)를 가져옵니다.
-        // 이렇게 하면 대시 같은 특수한 움직임의 속도도 애니메이션에 정확히 반영할 수 있습니다.
-        animator.UpdateAnimation(moveDir, movement.CurrentSpeed, moveInput);
+        // [수정] 대시 중일 때와 아닐 때의 로직을 분리합니다.
+        if (movement.isDashing)
+        {
+            // 대시 중일 때는 PlayerMovement에 저장된 대시 방향과 대시 속도를 애니메이션에 전달합니다.
+            // 이렇게 해야 키보드에서 손을 떼도 애니메이션 방향이 유지됩니다.
+            animator.UpdateAnimation(movement.DashDirection, dashSpeed, moveInput);
+        }
+        else
+        {
+            // 평상시에는 카메라 기준의 이동 방향과 현재 속도를 전달합니다.
+            Vector3 camForward = mainCamera.transform.forward;
+            camForward.y = 0;
+            camForward.Normalize();
+
+            Vector3 camRight = mainCamera.transform.right;
+            camRight.y = 0;
+            camRight.Normalize();
+
+            worldMoveDir = (camForward * moveInput.y + camRight * moveInput.x).normalized;
+
+            movement.SetMoveDirection(worldMoveDir);
+            animator.UpdateAnimation(worldMoveDir, movement.CurrentSpeed, moveInput);
+        }
     }
 
     private void FixedUpdate()
     {
         movement.Move(moveSpeed);
+    }
+
+    private void LookAtMouse()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, transform.position);
+
+        if (groundPlane.Raycast(ray, out float distance))
+        {
+            Vector3 worldPoint = ray.GetPoint(distance);
+            Vector3 lookDirection = worldPoint - transform.position;
+            lookDirection.y = 0f;
+
+            if (lookDirection.sqrMagnitude > 0.01f)
+            {
+                movement.Rotate(lookDirection.normalized);
+            }
+        }
     }
 }
