@@ -82,7 +82,7 @@ public class PlayerMovement : MonoBehaviour
 
         while ( Time.time < startTime + dashDuration )
         {
-            rb.linearVelocity = dashDir * dashSpeed;
+            Rotate(dashDir, true);
             yield return new WaitForFixedUpdate();
         }
 
