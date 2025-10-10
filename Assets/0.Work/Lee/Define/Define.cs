@@ -1,10 +1,17 @@
 
-public class Define 
+public class Define
 {
-    // ¸¸¾à ÀÌ°Å ¸»°íµµ »ç¿ëÇÑ MapÀÌ ÀÖÀ¸¸é ±×¶§¸¶´Ù Ãß°¡ÇÒ ¿¹Á¤
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Mapï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×¶ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public enum ActionMap
     {
         Player,
         UI,
+    }
+    public enum PlayerAni
+    {
+        None,
+        Attack,
+        Dash,
+        //ì¶”ê°€(ìŠ¤í‚¬?)
     }
 }

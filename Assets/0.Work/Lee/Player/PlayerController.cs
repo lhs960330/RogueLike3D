@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     private PlayerMovement movement;
     private PlayerAnimator animator;
+    private PlayerAttack Attack = new PlayerAttack();
 
     [Header("플레이어 속도")]
     [SerializeField] private float moveSpeed = 10;
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnMove( InputValue value )
     {
+   
         moveInput = value.Get<Vector2>();
     }
 
@@ -33,6 +35,7 @@ public class PlayerController : MonoBehaviour
 
         if (!movement.isDashing)
         {
+            
             animator.DashAnimation();
             movement.Dash(worldMoveDir, dashSpeed);
         }
@@ -70,6 +73,11 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         movement.Move(moveSpeed);
+    }
+
+    private void OnAttack(InputValue value)
+    {
+        animator.AttackAnimation();
     }
 
     // 마우스 방향으로 캐릭이 바라보기

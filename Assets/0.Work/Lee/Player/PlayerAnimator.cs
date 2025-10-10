@@ -18,7 +18,7 @@ public class PlayerAnimator : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    public void UpdateAnimation( Vector3 moveDir, float moveSpeed, Vector2 moveInput )
+    public void UpdateAnimation(Vector3 moveDir, float moveSpeed, Vector2 moveInput)
     {
         Vector3 localDir = transform.InverseTransformDirection(moveDir);
 
@@ -33,7 +33,7 @@ public class PlayerAnimator : MonoBehaviour
         if (moveSpeed > 0.1f)
         {
             float animDistancePerSecond = GetAnimDistancePerSecond(moveInput);
-            if ( animDistancePerSecond > 0.0001f )
+            if (animDistancePerSecond > 0.0001f)
             {
                 animator.speed = (moveSpeed / animDistancePerSecond) * animationSpeedMultiplier;
             }
@@ -49,11 +49,11 @@ public class PlayerAnimator : MonoBehaviour
         }
     }
 
-    public float GetAnimDistancePerSecond( Vector2 moveInput )
+    public float GetAnimDistancePerSecond(Vector2 moveInput)
     {
-        if ( Mathf.Abs(moveInput.y) > Mathf.Abs(moveInput.x) )
+        if (Mathf.Abs(moveInput.y) > Mathf.Abs(moveInput.x))
             return forwardAnimDistancePerSecond;
-        else if ( Mathf.Abs(moveInput.x) > 0.01f )
+        else if (Mathf.Abs(moveInput.x) > 0.01f)
             return strafeAnimDistancePerSecond;
         return 1f;
     }
@@ -62,4 +62,10 @@ public class PlayerAnimator : MonoBehaviour
     {
         animator.SetTrigger("Dash");
     }
+
+    public void AttackAnimation()
+    {
+        animator.SetTrigger("Attack");
+    }
+
 }
