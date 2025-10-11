@@ -50,7 +50,9 @@ private void OnEnable()
 
     private void Update()
     {
+        if(Manager.EXInput.CurrentMap == Define.ActionMap.Player)
         LookAtMouse();
+        
         if (movement.isDashing)
         {
             // 대시 중일 때는 PlayerMovement에 저장된 대시 방향과 대시 속도를 애니메이션에 전달합니다.

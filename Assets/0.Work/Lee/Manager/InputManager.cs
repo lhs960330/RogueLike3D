@@ -1,7 +1,8 @@
 using System;
-using System.IO;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 
 public class InputManager : Singleton<InputManager>
 {
@@ -10,7 +11,7 @@ public class InputManager : Singleton<InputManager>
     [SerializeField] PlayerInput playerInput;
 
     public Define.ActionMap CurrentMap { get; private set; }
-
+    private bool isSwitchingMap = false;
     public event Action<Vector2> OnMoveEvent;
     public event Action<InputAction.CallbackContext> OnAttackEvent;
     public event Action<InputAction.CallbackContext> OnDashEvent;
@@ -44,6 +45,8 @@ public class InputManager : Singleton<InputManager>
     {
         if (CurrentMap == map) return;
 
+        isSwitchingMap = true;
+
         switch (map)
         {
             case Define.ActionMap.Player:
@@ -58,19 +61,32 @@ public class InputManager : Singleton<InputManager>
 
         CurrentMap = map;
         Debug.Log(CurrentMap);
+        StartCoroutine(ResetSwitchingFlag());
     }
+     private IEnumerator ResetSwitchingFlag()
+      {
+          // 현재 프레임의 모든 처리가 끝날 때까지 기다립니다.
+          yield return new WaitForEndOfFrame();
+          isSwitchingMap = false;
+      }
     //InputActionAsset으로부터 받은 입력을 외부 C# 이벤트로 다시 전달
-  private void OnMenuOpen(InputAction.CallbackContext context)
-  {
-      ChangeInput(Define.ActionMap.UI);
-      Debug.Log("UI 맵으로 변경");
-  }
+    private void OnMenuOpen(InputAction.CallbackContext context)
+    {
+        if (isSwitchingMap) return;
+        {
+            ChangeInput(Define.ActionMap.UI);
+            Debug.Log("UI 맵으로 변경");
+        }
+    }
 
-  private void OnMenuClose(InputAction.CallbackContext context)
-  {
-      ChangeInput(Define.ActionMap.Player);
-      Debug.Log("Player 맵으로 변경");
-  }
+    private void OnMenuClose(InputAction.CallbackContext context)
+    {
+        if (isSwitchingMap) return;
+        {
+            ChangeInput(Define.ActionMap.Player);
+            Debug.Log("Player 맵으로 변경");
+        }
+    }
 
 
     private void OnMove(InputAction.CallbackContext context)
