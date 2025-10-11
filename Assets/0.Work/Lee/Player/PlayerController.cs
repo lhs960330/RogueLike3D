@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerMovement), typeof(PlayerAnimator))]
 public class PlayerController : MonoBehaviour
 {
+    private PlayerInput playerInput;
     private PlayerMovement movement;
     private PlayerAnimator animator;
     private PlayerAttack Attack = new PlayerAttack();
@@ -11,41 +13,44 @@ public class PlayerController : MonoBehaviour
     [Header("플레이어 속도")]
     [SerializeField] private float moveSpeed = 10;
     [SerializeField] private float dashSpeed = 10f;
-   
+
     private Vector2 moveInput;
     private Camera mainCamera;
     private Vector3 worldMoveDir;
 
+//OnEnable/OnDisable에서 InputManager의 이벤트를 구독/해제
+private void OnEnable()
+    {
+        if (InputManager.Instance != null)
+        {
+            Debug.Log("음/");
+            InputManager.Instance.OnMoveEvent += OnMove;
+            InputManager.Instance.OnAttackEvent += OnAttack;
+            InputManager.Instance.OnDashEvent += OnDash;
+        }
+    }
+
+  private void OnDisable()
+  {
+      if (InputManager.Instance != null)
+      {
+          InputManager.Instance.OnMoveEvent -= OnMove;
+          InputManager.Instance.OnAttackEvent -= OnAttack;
+          InputManager.Instance.OnDashEvent -= OnDash;
+      }
+  }
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
         animator = GetComponent<PlayerAnimator>();
         mainCamera = Camera.main;
+        playerInput = GetComponent<PlayerInput>();
     }
 
-    private void OnMove( InputValue value )
-    {
-   
-        moveInput = value.Get<Vector2>();
-    }
-
-    private void OnDash( InputValue value )
-    {
-        if (worldMoveDir.sqrMagnitude < 0.01f) return;
-
-        if (!movement.isDashing)
-        {
-            
-            animator.DashAnimation();
-            movement.Dash(worldMoveDir, dashSpeed);
-        }
-    }
 
     private void Update()
     {
         LookAtMouse();
-
-        
         if (movement.isDashing)
         {
             // 대시 중일 때는 PlayerMovement에 저장된 대시 방향과 대시 속도를 애니메이션에 전달합니다.
@@ -75,10 +80,7 @@ public class PlayerController : MonoBehaviour
         movement.Move(moveSpeed);
     }
 
-    private void OnAttack(InputValue value)
-    {
-        animator.AttackAnimation();
-    }
+
 
     // 마우스 방향으로 캐릭이 바라보기
     private void LookAtMouse()
@@ -98,4 +100,30 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    #region Input
+   private void OnMove(Vector2 value)
+  {
+      moveInput = value;
+  }
+
+  private void OnDash(InputAction.CallbackContext context)
+  {
+      if (worldMoveDir.sqrMagnitude < 0.01f) return;
+
+      if (!movement.isDashing)
+      {
+          animator.DashAnimation();
+          movement.Dash(worldMoveDir, dashSpeed);
+      }
+  }
+  private void OnAttack(InputAction.CallbackContext context)
+  {
+      if (context.started)
+          animator.AttackAnimation(true);
+      else if (context.canceled)
+          animator.AttackAnimation(false);
+  }
+    #endregion
+
+
 }

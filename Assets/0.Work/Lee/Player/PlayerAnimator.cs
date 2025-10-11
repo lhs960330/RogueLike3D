@@ -35,6 +35,7 @@ public class PlayerAnimator : MonoBehaviour
             float animDistancePerSecond = GetAnimDistancePerSecond(moveInput);
             if (animDistancePerSecond > 0.0001f)
             {
+                // 따로따로
                 animator.speed = (moveSpeed / animDistancePerSecond) * animationSpeedMultiplier;
             }
             else
@@ -63,9 +64,9 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetTrigger("Dash");
     }
 
-    public void AttackAnimation()
+    public void AttackAnimation(bool isAttack)
     {
-        animator.SetTrigger("Attack");
+        animator.SetBool("Attack", isAttack);
     }
 
 }
