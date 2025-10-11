@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerTest : MonoBehaviour
+/*public class PlayerTest : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] Animator animator;
@@ -58,3 +58,4 @@ public class PlayerTest : MonoBehaviour
             Manager.EXInput.OnUIClose();
     }
 }
+*/

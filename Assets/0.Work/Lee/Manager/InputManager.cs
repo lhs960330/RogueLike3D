@@ -1,19 +1,53 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
 public class InputManager : Singleton<InputManager>
 {
-    // ¿¡¼Â Æú´õ¿¡ÀÖ´Â inputAction °¡Áö°í ÀÖ±â
     [SerializeField] InputActionAsset inputActions;
-    // ÇöÀç InputMapÀÌ °¡¸®Å°°í ÀÖ´Â »óÅÂ?(Player, UIµî)
+
+    [SerializeField] PlayerInput playerInput;
+
     public Define.ActionMap CurrentMap { get; private set; }
-
-    // InputMap º¯°æ ÇÔ¼ö
-    public void ChangeInput( Define.ActionMap map )
+    private bool isSwitchingMap = false;
+    public event Action<Vector2> OnMoveEvent;
+    public event Action<InputAction.CallbackContext> OnAttackEvent;
+    public event Action<InputAction.CallbackContext> OnDashEvent;
+    private void OnEnable()
     {
-        if ( CurrentMap == map ) return;
+        // Player ì•¡ì…˜ ë§µì˜ ê° ì•¡ì…˜ì— private í•¸ë“¤ëŸ¬ í•¨ìˆ˜ë“¤ì„ êµ¬ë…
+        inputActions.FindActionMap("Player").FindAction("Move").performed += OnMove;
+        inputActions.FindActionMap("Player").FindAction("Move").canceled += OnMove;
+        inputActions.FindActionMap("Player").FindAction("Attack").started += OnAttack;
+        inputActions.FindActionMap("Player").FindAction("Attack").canceled += OnAttack;
+        inputActions.FindActionMap("Player").FindAction("Dash").started += OnDash;
+        inputActions.FindActionMap("Player").FindAction("OpenMenu").performed += OnMenuOpen;
+        inputActions.FindActionMap("UI").FindAction("CloseMenu").performed += OnMenuClose;
 
-        switch ( map )
+    }
+
+    private void OnDisable()
+    {
+        // êµ¬ë…í–ˆë˜ ëª¨ë“  ì´ë²¤íŠ¸ë¥¼ 'êµ¬ë… ì·¨ì†Œ'
+        // (ë©”ëª¨ë¦¬ ëˆ„ìˆ˜ ë°©ì§€)
+        inputActions.FindActionMap("Player").FindAction("Move").performed -= OnMove;
+        inputActions.FindActionMap("Player").FindAction("Move").canceled -= OnMove;
+        inputActions.FindActionMap("Player").FindAction("Attack").started -= OnAttack;
+        inputActions.FindActionMap("Player").FindAction("Attack").canceled -= OnAttack;
+        inputActions.FindActionMap("Player").FindAction("Cancel").started -= OnDash;
+        inputActions.FindActionMap("Player").FindAction("Cancel").performed -= OnMenuOpen;
+        inputActions.FindActionMap("UI").FindAction("CloseMenu").performed -= OnMenuClose;
+    }
+
+    public void ChangeInput(Define.ActionMap map)
+    {
+        if (CurrentMap == map) return;
+
+        isSwitchingMap = true;
+
+        switch (map)
         {
             case Define.ActionMap.Player:
                 inputActions.FindActionMap("UI").Disable();
@@ -27,19 +61,47 @@ public class InputManager : Singleton<InputManager>
 
         CurrentMap = map;
         Debug.Log(CurrentMap);
+        StartCoroutine(ResetSwitchingFlag());
+    }
+     private IEnumerator ResetSwitchingFlag()
+      {
+          // í˜„ì¬ í”„ë ˆì„ì˜ ëª¨ë“  ì²˜ë¦¬ê°€ ëë‚  ë•Œê¹Œì§€ ê¸°ë‹¤ë¦½ë‹ˆë‹¤.
+          yield return new WaitForEndOfFrame();
+          isSwitchingMap = false;
+      }
+    //InputActionAssetìœ¼ë¡œë¶€í„° ë°›ì€ ì…ë ¥ì„ ì™¸ë¶€ C# ì´ë²¤íŠ¸ë¡œ ë‹¤ì‹œ ì „ë‹¬
+    private void OnMenuOpen(InputAction.CallbackContext context)
+    {
+        if (isSwitchingMap) return;
+        {
+            ChangeInput(Define.ActionMap.UI);
+            Debug.Log("UI ë§µìœ¼ë¡œ ë³€ê²½");
+        }
     }
 
-    // ÀÌ°É·Î UI Open CloseÇÏ¸éµÉµí?
-    // ÁÖÀÇÁ¡ : ¼³Á¤Å° ÀÌ¸§ÀÌ °°¾Æ¾ßµÊ InputAction¿¡ Player¶û UI·Î ³ª´²Á® ÀÖ¾î¼­ ¼³Á¤Å°°¡ °°Àº Å°¿©¾ßÁö¸¸ ÀüÈ¯ÀÌ °¡´É
-    public void OnUIOpen()
+    private void OnMenuClose(InputAction.CallbackContext context)
     {
-        ChangeInput(Define.ActionMap.UI);
-        Debug.Log("UI È°¼ºÈ­");
+        if (isSwitchingMap) return;
+        {
+            ChangeInput(Define.ActionMap.Player);
+            Debug.Log("Player ë§µìœ¼ë¡œ ë³€ê²½");
+        }
     }
 
-    public void OnUIClose()
+
+    private void OnMove(InputAction.CallbackContext context)
     {
-        ChangeInput(Define.ActionMap.Player);
-        Debug.Log("Player È°¼ºÈ­");
+        // OnMoveEventë¥¼ êµ¬ë…í•œ ëª¨ë“  ëŒ€ìƒì—ê²Œ ê°’ì„ ì „ë‹¬
+        OnMoveEvent?.Invoke(context.ReadValue<Vector2>());
     }
+
+      private void OnAttack(InputAction.CallbackContext context)
+      {
+          OnAttackEvent?.Invoke(context);
+      }
+
+      private void OnDash(InputAction.CallbackContext context)
+      {
+          OnDashEvent?.Invoke(context);
+      }
 }
