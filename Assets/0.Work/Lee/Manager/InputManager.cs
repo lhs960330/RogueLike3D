@@ -36,8 +36,8 @@ public class InputManager : Singleton<InputManager>
         inputActions.FindActionMap("Player").FindAction("Move").canceled -= OnMove;
         inputActions.FindActionMap("Player").FindAction("Attack").started -= OnAttack;
         inputActions.FindActionMap("Player").FindAction("Attack").canceled -= OnAttack;
-        inputActions.FindActionMap("Player").FindAction("Cancel").started -= OnDash;
-        inputActions.FindActionMap("Player").FindAction("Cancel").performed -= OnMenuOpen;
+        inputActions.FindActionMap("Player").FindAction("Dash").started -= OnDash;
+        inputActions.FindActionMap("Player").FindAction("OpenMenu").performed -= OnMenuOpen;
         inputActions.FindActionMap("UI").FindAction("CloseMenu").performed -= OnMenuClose;
     }
 

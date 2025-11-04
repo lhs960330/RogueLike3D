@@ -24,6 +24,10 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetFloat("MoveY", moveY);
 
     }
+    public void JumpAnimation()
+    {
+        
+    }
 
 
     public void DashAnimation()

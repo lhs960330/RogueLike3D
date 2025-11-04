@@ -14,7 +14,7 @@ public class WeaponHitbox : MonoBehaviour
         hitBoxCo.enabled = false;// 평소에는 비활성화
     }
 
-    private void OggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         IDamageable damageableTarget = other.GetComponent<IDamageable>();
         // 데미지를 줄 수 있고, 이번 공격에서 처음 맞는 대상이라면
