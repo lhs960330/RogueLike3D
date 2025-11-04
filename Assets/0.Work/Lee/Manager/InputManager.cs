@@ -63,12 +63,14 @@ public class InputManager : Singleton<InputManager>
         Debug.Log(CurrentMap);
         StartCoroutine(ResetSwitchingFlag());
     }
-     private IEnumerator ResetSwitchingFlag()
-      {
-          // 현재 프레임의 모든 처리가 끝날 때까지 기다립니다.
-          yield return new WaitForEndOfFrame();
-          isSwitchingMap = false;
-      }
+    private IEnumerator ResetSwitchingFlag()
+    {
+        // 현재 프레임의 모든 처리가 끝날 때까지 기다립니다.
+        yield return new WaitForEndOfFrame();
+        isSwitchingMap = false;
+    }
+
+    #region Input
     //InputActionAsset으로부터 받은 입력을 외부 C# 이벤트로 다시 전달
     private void OnMenuOpen(InputAction.CallbackContext context)
     {
@@ -95,13 +97,14 @@ public class InputManager : Singleton<InputManager>
         OnMoveEvent?.Invoke(context.ReadValue<Vector2>());
     }
 
-      private void OnAttack(InputAction.CallbackContext context)
-      {
-          OnAttackEvent?.Invoke(context);
-      }
+    private void OnAttack(InputAction.CallbackContext context)
+    {
+        OnAttackEvent?.Invoke(context);
+    }
 
-      private void OnDash(InputAction.CallbackContext context)
-      {
-          OnDashEvent?.Invoke(context);
-      }
+    private void OnDash(InputAction.CallbackContext context)
+    {
+        OnDashEvent?.Invoke(context);
+    }
+      #endregion
 }

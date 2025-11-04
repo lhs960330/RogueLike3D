@@ -13,15 +13,17 @@ public class PlayerMovement : MonoBehaviour
 
   
     [SerializeField] private float dashDuration = 0.2f;
-   
+
     [SerializeField] private float rotationSpeed = 10f;
+    [SerializeField] private float drag = 10; // 저항 값 (관성 제어)              
 
     private Vector3 moveDirection;
-    private Rigidbody rb;
+    private Rigidbody rb ;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        rb.linearDamping = drag; // Rigidbody의 drag 값 설정    
         rb.interpolation = RigidbodyInterpolation.Interpolate; // Rigidbody의 움직임을 부드럽게 보간합니다.
         rb.freezeRotation = true;
     }
@@ -32,20 +34,18 @@ public class PlayerMovement : MonoBehaviour
         moveDirection = dir.normalized;
     }
 
-    public void Move( float moveSpeed )
+    public void Move( float maxSpeed, float moveForce  )
     {
         // 대시 중에는 일반 이동이 불가능하도록 막습니다.
         if (isDashing) return;
 
-        if (moveDirection.sqrMagnitude > 0.01f)
+        rb.AddForce(moveDirection * moveForce, ForceMode.Force);
+
+        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        if(horizontalVelocity.magnitude > maxSpeed)
         {
-            Vector3 targetPos = rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime;
-            rb.MovePosition(targetPos);
-            CurrentSpeed = moveSpeed; // 현재 이동 속도를 기록합니다.
-        }
-        else
-        {
-            CurrentSpeed = 0f;
+            Vector3 limitedVelocity = horizontalVelocity.normalized * maxSpeed;                                           
+              rb.linearVelocity = new Vector3(limitedVelocity.x, rb.linearVelocity.y, limitedVelocity.z);   
         }
     }
 
