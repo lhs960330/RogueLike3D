@@ -1,93 +1,78 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(PlayerMovement), typeof(PlayerAnimator))]
+[RequireComponent(typeof(PlayerMovement), typeof(PlayerAnimator), typeof(PlayerAttack))]
 public class PlayerController : MonoBehaviour
 {
-    private PlayerInput playerInput;
     private PlayerMovement movement;
-    private PlayerAnimator animator;
-    private PlayerAttack Attack = new PlayerAttack();
-
-    [Header("플레이어 속도")]
-    [SerializeField] private float moveSpeed = 10;
-    [SerializeField] private float dashSpeed = 10f;
+    private PlayerAnimator playerAnimator;
+    private PlayerAttack playerAttack;
 
     private Vector2 moveInput;
     private Camera mainCamera;
-    private Vector3 worldMoveDir;
 
-//OnEnable/OnDisable에서 InputManager의 이벤트를 구독/해제
-private void OnEnable()
+    [Header("State Checks")]
+    public bool IsGrounded;
+
+    private void OnEnable()
     {
         if (InputManager.Instance != null)
         {
-            Debug.Log("음/");
             InputManager.Instance.OnMoveEvent += OnMove;
             InputManager.Instance.OnAttackEvent += OnAttack;
             InputManager.Instance.OnDashEvent += OnDash;
+            InputManager.Instance.OnJumpEvent += OnJump;
         }
     }
 
-  private void OnDisable()
-  {
-      if (InputManager.Instance != null)
-      {
-          InputManager.Instance.OnMoveEvent -= OnMove;
-          InputManager.Instance.OnAttackEvent -= OnAttack;
-          InputManager.Instance.OnDashEvent -= OnDash;
-      }
-  }
+    private void OnDisable()
+    {
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnMoveEvent -= OnMove;
+            InputManager.Instance.OnAttackEvent -= OnAttack;
+            InputManager.Instance.OnDashEvent -= OnDash;
+            InputManager.Instance.OnJumpEvent -= OnJump;
+        }
+    }
+
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
-        animator = GetComponent<PlayerAnimator>();
+        playerAnimator = GetComponent<PlayerAnimator>();
+        playerAttack = GetComponent<PlayerAttack>();
         mainCamera = Camera.main;
-        playerInput = GetComponent<PlayerInput>();
-    }
-
+}
+            
 
     private void Update()
     {
-        if(Manager.EXInput.CurrentMap == Define.ActionMap.Player)
-        LookAtMouse();
-        
-        if (movement.isDashing)
-        {
-            // 대시 중일 때는 PlayerMovement에 저장된 대시 방향과 대시 속도를 애니메이션에 전달합니다.
-            // 이렇게 해야 키보드에서 손을 떼도 애니메이션 방향이 유지됩니다.
-            animator.UpdateAnimation(movement.DashDirection, dashSpeed, moveInput);
-        }
-        else
-        {
-            // 평상시에는 카메라 기준의 이동 방향과 현재 속도를 전달합니다.
-            Vector3 camForward = mainCamera.transform.forward;
-            camForward.y = 0;
-            camForward.Normalize();
+        // Manager.EXInput이 유효하다고 가정합니다.
+        if (Manager.EXInput.CurrentMap == Define.ActionMap.Player)
+            LookAtMouse();
 
-            Vector3 camRight = mainCamera.transform.right;
-            camRight.y = 0;
-            camRight.Normalize();
+        // 카메라 방향을 기준으로 월드 이동 방향 계산
+        Vector3 camForward = mainCamera.transform.forward;
+        camForward.y = 0;
+        Vector3 camRight = mainCamera.transform.right;
+        camRight.y = 0;
+        Vector3 worldMoveDir = (camForward * moveInput.y + camRight * moveInput.x).normalized;
 
-            worldMoveDir = (camForward * moveInput.y + camRight * moveInput.x).normalized;
-
-            movement.SetMoveDirection(worldMoveDir);
-            animator.UpdateAnimation(worldMoveDir, movement.CurrentSpeed, moveInput);
-        }
+        // 이동 방향과 애니메이션 업데이트
+        movement.SetMoveDirection(worldMoveDir);
+        playerAnimator.UpdateAnimation(worldMoveDir);
     }
 
     private void FixedUpdate()
     {
-        movement.Move(moveSpeed);
+        // 물리 기반 이동 실행 (이제 파라미터가 필요 없습니다)
+        movement.Move();
     }
 
-
-
-    // 마우스 방향으로 캐릭이 바라보기
     private void LookAtMouse()
     {
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         Plane groundPlane = new Plane(Vector3.up, transform.position);
 
         if (groundPlane.Raycast(ray, out float distance))
@@ -98,34 +83,37 @@ private void OnEnable()
 
             if (lookDirection.sqrMagnitude > 0.01f)
             {
-                movement.Rotate(lookDirection.normalized);
+                movement.Rotate(lookDirection);
             }
         }
     }
-    #region Input
-   private void OnMove(Vector2 value)
-  {
-      moveInput = value;
-  }
 
-  private void OnDash(InputAction.CallbackContext context)
-  {
-      if (worldMoveDir.sqrMagnitude < 0.01f) return;
+    #region Input Handlers
+    private void OnMove(Vector2 value)
+    {
+        moveInput = value;
+    }
 
-      if (!movement.isDashing)
-      {
-          animator.DashAnimation();
-          movement.Dash(worldMoveDir, dashSpeed);
-      }
-  }
-  private void OnAttack(InputAction.CallbackContext context)
-  {
-      if (context.started)
-          animator.AttackAnimation(true);
-      else if (context.canceled)
-          animator.AttackAnimation(false);
-  }
+    private void OnDash(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            playerAnimator.DashAnimation();
+            movement.Dash(); // 파라미터가 필요 없습니다.
+        }
+    }
+
+    private void OnAttack(InputAction.CallbackContext context)
+    {
+        if (context.started)
+            playerAttack.StartAttack();
+        else if (context.canceled)
+            playerAttack.CancelAttack();
+    }
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        
+    }
     #endregion
-
-
 }

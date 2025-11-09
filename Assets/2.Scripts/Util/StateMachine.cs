@@ -45,6 +45,12 @@ public class StateMachine<T> where T : Enum
 public class BaseState<T> where T : Enum
 {
     private StateMachine<T> stateMachine;
+    private StateMachine<Define.PlayerState> stateMachine1;
+
+    public BaseState(StateMachine<Define.PlayerState> stateMachine1)
+    {
+        this.stateMachine1 = stateMachine1;
+    }
 
     public void SetStateMachine(StateMachine<T> stateMachine)
     {

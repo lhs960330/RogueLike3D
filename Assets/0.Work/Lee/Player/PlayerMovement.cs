@@ -1,60 +1,68 @@
 using System.Collections;
 using UnityEngine;
 
-// Rigidbody 컴포넌트가 필수로 존재하도록 보장합니다.
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(PlayerStats))]
 public class PlayerMovement : MonoBehaviour
 {
-    public bool isDashing { get; private set; }
-  
-    public float CurrentSpeed { get; private set; }
+    public bool IsDashing { get; private set; }
+    public Vector3 MoveDirection { get; private set; }
+    public bool IsGrounded { get; private set; }
+    private float groundCheckDistance = 0.2f;
 
-    public Vector3 DashDirection { get; private set; }
-
-  
-    [SerializeField] private float dashDuration = 0.2f;
-   
-    [SerializeField] private float rotationSpeed = 10f;
-
-    private Vector3 moveDirection;
     private Rigidbody rb;
+    private PlayerStats stats;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.interpolation = RigidbodyInterpolation.Interpolate; // Rigidbody의 움직임을 부드럽게 보간합니다.
+        stats = GetComponent<PlayerStats>();
+
+        rb.linearDamping = stats.drag;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.freezeRotation = true;
     }
 
-    public void SetMoveDirection( Vector3 dir )
+    void Update()
     {
-        // 어떤 크기의 벡터가 들어와도 일관된 방향을 유지하기 위해 항상 정규화(normalized)합니다.
-        moveDirection = dir.normalized;
+        CheckGrounded();
+
+    }
+    private void CheckGrounded()
+    {
+        IsGrounded = Physics.Raycast(transform.position, Vector3.down, stats.height / 2 + groundCheckDistance);
+    }
+    public void SetMoveDirection(Vector3 dir)
+    {
+        MoveDirection = dir.normalized;
     }
 
-    public void Move( float moveSpeed )
+    public void Move()
     {
-        // 대시 중에는 일반 이동이 불가능하도록 막습니다.
-        if (isDashing) return;
+        if (IsDashing) return;
 
-        if (moveDirection.sqrMagnitude > 0.01f)
+        rb.AddForce(MoveDirection * stats.moveForce, ForceMode.Force);
+
+        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        if (horizontalVelocity.magnitude > stats.maxSpeed)
         {
-            Vector3 targetPos = rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime;
-            rb.MovePosition(targetPos);
-            CurrentSpeed = moveSpeed; // 현재 이동 속도를 기록합니다.
-        }
-        else
-        {
-            CurrentSpeed = 0f;
+            Vector3 limitedVelocity = horizontalVelocity.normalized * stats.maxSpeed;
+            rb.linearVelocity = new Vector3(limitedVelocity.x, rb.linearVelocity.y, limitedVelocity.z);
         }
     }
 
-    public void Dash( Vector3 direction, float speed )
+    public void Dash()
     {
-        if (direction.sqrMagnitude > 0.01f)
+        if (MoveDirection.sqrMagnitude > 0.01f && !IsDashing)
         {
-            StartCoroutine(DashCoroutine(direction.normalized, speed));
+            StartCoroutine(DashCoroutine());
         }
+    }
+
+    public void Jump()
+    {
+        if (!IsGrounded) return;
+
+        rb.AddForce(Vector3.up * stats.jumpForce, ForceMode.Impulse);
     }
 
     public void Rotate(Vector3 direction, bool isInstant = false)
@@ -62,30 +70,30 @@ public class PlayerMovement : MonoBehaviour
         if (direction == Vector3.zero) return;
 
         Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-        if (isInstant) // 즉시 회전이 필요할 경우 (예: 대시)
+        if (isInstant)
         {
             transform.rotation = targetRotation;
         }
-        else // 일반 이동 시에는 부드럽게 회전
+        else
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, stats.rotationSpeed * Time.deltaTime);
         }
     }
 
-    private IEnumerator DashCoroutine( Vector3 dashDir, float dashSpeed )
+    private IEnumerator DashCoroutine()
     {
-        isDashing = true;
-        DashDirection = dashDir; 
+        IsDashing = true;
         float startTime = Time.time;
+        
+        rb.linearVelocity = new Vector3(MoveDirection.x * stats.dashSpeed, rb.linearVelocity.y, MoveDirection.z * stats.dashSpeed);
 
-        while ( Time.time < startTime + dashDuration )
+        while (Time.time < startTime + stats.dashDuration)
         {
-            Rotate(dashDir, true);
-            yield return new WaitForFixedUpdate();
+            Rotate(MoveDirection, true);
+            yield return null;
         }
 
-        rb.linearVelocity = Vector3.zero;
-        isDashing = false;
-        DashDirection = Vector3.zero; 
+        rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
+        IsDashing = false;
     }
 }

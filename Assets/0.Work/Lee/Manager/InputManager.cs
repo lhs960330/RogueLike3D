@@ -15,6 +15,7 @@ public class InputManager : Singleton<InputManager>
     public event Action<Vector2> OnMoveEvent;
     public event Action<InputAction.CallbackContext> OnAttackEvent;
     public event Action<InputAction.CallbackContext> OnDashEvent;
+    public event Action<InputAction.CallbackContext> OnJumpEvent;
     private void OnEnable()
     {
         // Player 액션 맵의 각 액션에 private 핸들러 함수들을 구독
@@ -24,6 +25,8 @@ public class InputManager : Singleton<InputManager>
         inputActions.FindActionMap("Player").FindAction("Attack").canceled += OnAttack;
         inputActions.FindActionMap("Player").FindAction("Dash").started += OnDash;
         inputActions.FindActionMap("Player").FindAction("OpenMenu").performed += OnMenuOpen;
+        inputActions.FindActionMap("Player").FindAction("Jump").performed += OnJump;
+
         inputActions.FindActionMap("UI").FindAction("CloseMenu").performed += OnMenuClose;
 
     }
@@ -36,8 +39,10 @@ public class InputManager : Singleton<InputManager>
         inputActions.FindActionMap("Player").FindAction("Move").canceled -= OnMove;
         inputActions.FindActionMap("Player").FindAction("Attack").started -= OnAttack;
         inputActions.FindActionMap("Player").FindAction("Attack").canceled -= OnAttack;
-        inputActions.FindActionMap("Player").FindAction("Cancel").started -= OnDash;
-        inputActions.FindActionMap("Player").FindAction("Cancel").performed -= OnMenuOpen;
+        inputActions.FindActionMap("Player").FindAction("Dash").started -= OnDash;
+        inputActions.FindActionMap("Player").FindAction("OpenMenu").performed -= OnMenuOpen;
+        inputActions.FindActionMap("Player").FindAction("Jump").performed -= OnJump;
+
         inputActions.FindActionMap("UI").FindAction("CloseMenu").performed -= OnMenuClose;
     }
 
@@ -63,12 +68,14 @@ public class InputManager : Singleton<InputManager>
         Debug.Log(CurrentMap);
         StartCoroutine(ResetSwitchingFlag());
     }
-     private IEnumerator ResetSwitchingFlag()
-      {
-          // 현재 프레임의 모든 처리가 끝날 때까지 기다립니다.
-          yield return new WaitForEndOfFrame();
-          isSwitchingMap = false;
-      }
+    private IEnumerator ResetSwitchingFlag()
+    {
+        // 현재 프레임의 모든 처리가 끝날 때까지 기다립니다.
+        yield return new WaitForEndOfFrame();
+        isSwitchingMap = false;
+    }
+
+    #region Input
     //InputActionAsset으로부터 받은 입력을 외부 C# 이벤트로 다시 전달
     private void OnMenuOpen(InputAction.CallbackContext context)
     {
@@ -95,13 +102,18 @@ public class InputManager : Singleton<InputManager>
         OnMoveEvent?.Invoke(context.ReadValue<Vector2>());
     }
 
-      private void OnAttack(InputAction.CallbackContext context)
-      {
-          OnAttackEvent?.Invoke(context);
-      }
+    private void OnAttack(InputAction.CallbackContext context)
+    {
+        OnAttackEvent?.Invoke(context);
+    }
 
-      private void OnDash(InputAction.CallbackContext context)
-      {
-          OnDashEvent?.Invoke(context);
-      }
+    private void OnDash(InputAction.CallbackContext context)
+    {
+        OnDashEvent?.Invoke(context);
+    }
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        OnJumpEvent?.Invoke(context);
+    }
+      #endregion
 }
