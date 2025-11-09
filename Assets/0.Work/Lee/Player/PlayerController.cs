@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,6 +12,9 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     private Camera mainCamera;
 
+    [Header("State Checks")]
+    public bool IsGrounded;
+
     private void OnEnable()
     {
         if (InputManager.Instance != null)
@@ -18,6 +22,7 @@ public class PlayerController : MonoBehaviour
             InputManager.Instance.OnMoveEvent += OnMove;
             InputManager.Instance.OnAttackEvent += OnAttack;
             InputManager.Instance.OnDashEvent += OnDash;
+            InputManager.Instance.OnJumpEvent += OnJump;
         }
     }
 
@@ -28,6 +33,7 @@ public class PlayerController : MonoBehaviour
             InputManager.Instance.OnMoveEvent -= OnMove;
             InputManager.Instance.OnAttackEvent -= OnAttack;
             InputManager.Instance.OnDashEvent -= OnDash;
+            InputManager.Instance.OnJumpEvent -= OnJump;
         }
     }
 
@@ -37,7 +43,8 @@ public class PlayerController : MonoBehaviour
         playerAnimator = GetComponent<PlayerAnimator>();
         playerAttack = GetComponent<PlayerAttack>();
         mainCamera = Camera.main;
-    }
+}
+            
 
     private void Update()
     {
@@ -102,6 +109,11 @@ public class PlayerController : MonoBehaviour
             playerAttack.StartAttack();
         else if (context.canceled)
             playerAttack.CancelAttack();
+    }
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        
     }
     #endregion
 }

@@ -15,6 +15,7 @@ public class InputManager : Singleton<InputManager>
     public event Action<Vector2> OnMoveEvent;
     public event Action<InputAction.CallbackContext> OnAttackEvent;
     public event Action<InputAction.CallbackContext> OnDashEvent;
+    public event Action<InputAction.CallbackContext> OnJumpEvent;
     private void OnEnable()
     {
         // Player 액션 맵의 각 액션에 private 핸들러 함수들을 구독
@@ -24,6 +25,8 @@ public class InputManager : Singleton<InputManager>
         inputActions.FindActionMap("Player").FindAction("Attack").canceled += OnAttack;
         inputActions.FindActionMap("Player").FindAction("Dash").started += OnDash;
         inputActions.FindActionMap("Player").FindAction("OpenMenu").performed += OnMenuOpen;
+        inputActions.FindActionMap("Player").FindAction("Jump").performed += OnJump;
+
         inputActions.FindActionMap("UI").FindAction("CloseMenu").performed += OnMenuClose;
 
     }
@@ -38,6 +41,8 @@ public class InputManager : Singleton<InputManager>
         inputActions.FindActionMap("Player").FindAction("Attack").canceled -= OnAttack;
         inputActions.FindActionMap("Player").FindAction("Dash").started -= OnDash;
         inputActions.FindActionMap("Player").FindAction("OpenMenu").performed -= OnMenuOpen;
+        inputActions.FindActionMap("Player").FindAction("Jump").performed -= OnJump;
+
         inputActions.FindActionMap("UI").FindAction("CloseMenu").performed -= OnMenuClose;
     }
 
@@ -105,6 +110,10 @@ public class InputManager : Singleton<InputManager>
     private void OnDash(InputAction.CallbackContext context)
     {
         OnDashEvent?.Invoke(context);
+    }
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        OnJumpEvent?.Invoke(context);
     }
       #endregion
 }

@@ -20,6 +20,10 @@ public class PlayerStats : MonoBehaviour, IDamageable
     [Header("Attack")]
     [SerializeField] public int attackDamage = 10;
 
+    [Header("Jump")]
+    [SerializeField] public float jumpForce = 1;
+    [SerializeField] public float height = 2;
+
     private void Awake()
     {
         currentHp = maxHp;

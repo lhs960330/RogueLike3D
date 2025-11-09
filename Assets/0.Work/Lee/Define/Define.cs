@@ -12,6 +12,16 @@ public class Define
         None,
         Attack,
         Dash,
+        Jump,
         //추가(스킬?)
     }
+    public enum PlayerState
+    {
+        Idle,
+        Moving,
+        Jumping,
+        Falling,
+        Landing
+    }
+    
 }

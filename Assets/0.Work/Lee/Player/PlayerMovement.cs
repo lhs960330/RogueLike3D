@@ -6,6 +6,8 @@ public class PlayerMovement : MonoBehaviour
 {
     public bool IsDashing { get; private set; }
     public Vector3 MoveDirection { get; private set; }
+    public bool IsGrounded { get; private set; }
+    private float groundCheckDistance = 0.2f;
 
     private Rigidbody rb;
     private PlayerStats stats;
@@ -20,6 +22,15 @@ public class PlayerMovement : MonoBehaviour
         rb.freezeRotation = true;
     }
 
+    void Update()
+    {
+        CheckGrounded();
+
+    }
+    private void CheckGrounded()
+    {
+        IsGrounded = Physics.Raycast(transform.position, Vector3.down, stats.height / 2 + groundCheckDistance);
+    }
     public void SetMoveDirection(Vector3 dir)
     {
         MoveDirection = dir.normalized;
@@ -49,7 +60,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void Jump()
     {
-        
+        if (!IsGrounded) return;
+
+        rb.AddForce(Vector3.up * stats.jumpForce, ForceMode.Impulse);
     }
 
     public void Rotate(Vector3 direction, bool isInstant = false)

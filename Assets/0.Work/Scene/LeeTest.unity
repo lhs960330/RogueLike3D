@@ -754,11 +754,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &955891122 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6933816358721130312, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
-  m_PrefabInstance: {fileID: 967598423815900688}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1039442931
 GameObject:
   m_ObjectHideFlags: 0
@@ -1010,10 +1005,23 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2106584551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106584546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c785dbfd48361541bf4ccf7062a9c5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attack: {fileID: 0}
 --- !u!1001 &967598423815900688
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1266,6 +1274,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 7676630525958566749, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
+      propertyPath: weaponHitbox
+      value: 
+      objectReference: {fileID: 2106584551}
     - target: {fileID: 7788145293242691768, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -1310,35 +1322,21 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6933816358721130312, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8265799009664948052}
     - targetCorrespondingSourceObject: {fileID: 8002465126352058038, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2106584548}
     - targetCorrespondingSourceObject: {fileID: 8002465126352058038, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2106584549}
+    - targetCorrespondingSourceObject: {fileID: 8002465126352058038, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2106584551}
   m_SourcePrefab: {fileID: 100100000, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
 --- !u!4 &8265799009664948045 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2782299336129174156, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
   m_PrefabInstance: {fileID: 967598423815900688}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8265799009664948052
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 955891122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76e73c2150c2e5a4985d94d09836d2f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponHitbox: {fileID: 0}
-  playerAnimator: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

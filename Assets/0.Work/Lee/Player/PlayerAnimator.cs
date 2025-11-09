@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 
 // [추가] Animator 컴포넌트가 필수로 존재하도록 보장합니다.
@@ -38,6 +39,10 @@ public class PlayerAnimator : MonoBehaviour
     public void AttackAnimation(bool isAttack)
     {
         animator.SetBool("Attack", isAttack);
+    }
+    public void JumpAnimation(int jumpValue)
+    {
+        
     }
 
 }
