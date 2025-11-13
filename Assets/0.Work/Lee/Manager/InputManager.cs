@@ -25,7 +25,7 @@ public class InputManager : Singleton<InputManager>
         inputActions.FindActionMap("Player").FindAction("Attack").canceled += OnAttack;
         inputActions.FindActionMap("Player").FindAction("Dash").started += OnDash;
         inputActions.FindActionMap("Player").FindAction("OpenMenu").performed += OnMenuOpen;
-        inputActions.FindActionMap("Player").FindAction("Jump").performed += OnJump;
+        inputActions.FindActionMap("Player").FindAction("Jump").started += OnJump;
 
         inputActions.FindActionMap("UI").FindAction("CloseMenu").performed += OnMenuClose;
 
@@ -41,7 +41,7 @@ public class InputManager : Singleton<InputManager>
         inputActions.FindActionMap("Player").FindAction("Attack").canceled -= OnAttack;
         inputActions.FindActionMap("Player").FindAction("Dash").started -= OnDash;
         inputActions.FindActionMap("Player").FindAction("OpenMenu").performed -= OnMenuOpen;
-        inputActions.FindActionMap("Player").FindAction("Jump").performed -= OnJump;
+        inputActions.FindActionMap("Player").FindAction("Jump").started -= OnJump;
 
         inputActions.FindActionMap("UI").FindAction("CloseMenu").performed -= OnMenuClose;
     }
