@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     private Camera mainCamera;
 
     [Header("State Checks")]
-    public bool IsGrounded;
+    public bool isGrounded;
 
     private void OnEnable()
     {
@@ -113,7 +113,11 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        
+        if (context.started)
+        {
+            movement.Jump();
+            playerAnimator.JumpAnimation();
+        }
     }
     #endregion
 }

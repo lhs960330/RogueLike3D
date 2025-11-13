@@ -8,8 +8,8 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public int currentHp { get; private set; }
 
     [Header("Movement")]
-    [SerializeField] public float moveForce = 50f;
-    [SerializeField] public float maxSpeed = 5f;
+    [SerializeField] public float moveForce = 300f;
+    [SerializeField] public float maxSpeed = 10f;
     [SerializeField] public float drag = 10f;
     [SerializeField] public float rotationSpeed = 10f;
 
@@ -21,8 +21,8 @@ public class PlayerStats : MonoBehaviour, IDamageable
     [SerializeField] public int attackDamage = 10;
 
     [Header("Jump")]
-    [SerializeField] public float jumpForce = 1;
-    [SerializeField] public float height = 2;
+    [SerializeField] public float jumpForce = 10;
+    [SerializeField] public float height = 1;
 
     private void Awake()
     {

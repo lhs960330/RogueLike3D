@@ -561,7 +561,7 @@ GameObject:
   - component: {fileID: 417949253}
   - component: {fileID: 417949252}
   - component: {fileID: 417949251}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1154,6 +1154,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 3751191560891056722, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
+      propertyPath: moveForce
+      value: 300
+      objectReference: {fileID: 0}
     - target: {fileID: 4095661027328402973, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -1278,6 +1282,10 @@ PrefabInstance:
       propertyPath: weaponHitbox
       value: 
       objectReference: {fileID: 2106584551}
+    - target: {fileID: 7732298045311496089, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
+      propertyPath: groundMask.m_Bits
+      value: 256
+      objectReference: {fileID: 0}
     - target: {fileID: 7788145293242691768, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -1297,6 +1305,10 @@ PrefabInstance:
     - target: {fileID: 8002465126352058038, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8088212209527689357, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
+      propertyPath: m_Mass
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8269779990292533150, guid: 1b51cea00c3e72b4aa7b81dc11bc8071, type: 3}
       propertyPath: m_Layer
